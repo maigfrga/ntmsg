@@ -37,7 +37,7 @@ your credentials is by creating ~/.aws/credentials file and adding the lines bel
 Configuration params
 =======================
 
-You need to define a config.js file on the root folder with next values:
+You need to define a config.json wherever you want with values:
 
 
 * ["sqs"]["url"] = Queue url, it has to exists, this application doesn"t not create
@@ -58,6 +58,10 @@ Configuration File Example
         "url": "https://us-west-2.queue.amazonaws.com/63396744/myqueue",
         "interval": 10,
         "max-number-of-messages": 10
+     },
+     "logger": {
+         "filename": "/var/log/ntmsg.log",
+         "console": true
      }
 }
 ```
@@ -75,25 +79,26 @@ npm install
 Message structure
 ===============================
 
-NTMGS expects json messasges, one by every email to be sent. Below a json
+NTMGS expects json messages, one by every email to be sent. Below a json
 structure example:
 
 
 ```
     {
         "uuid": "95d818b8-9bd0-11e4-a124-28d2447f45b8",
-        "recipients": ["user1@email.com", "user2@another.com"],
+        "from": "remitent@email.com",
+        "to": ["user1@email.com", "user2@another.com"],
         "subject": "test message",
-        "plain_text": "hello world",
-        "html_text": "<hmtl><body> <h1>Hello world</h1> </hmtl></hmtl>"
+        "text": "hello world",
+        "html": "<h1>Hello world</h1>"
     }
 ```
 
+Usage
+================
+
+* iojs app/worker.js --config /my/config/location/config.json
+
+* nodejs app/worker.js --config /my/config/location/config.json
 
 
-
-
-
-
-Ussage
-=================
