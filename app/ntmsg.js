@@ -20,21 +20,12 @@ module.exports = function(config) {
             _sqs_params = {
                 QueueUrl: config.sqs.url,
                 MaxNumberOfMessages: config.sqs['max-number-of-messages'],
-                WaitTimeSeconds: 0
+                WaitTimeSeconds: 0,
+                VisibilityTimeout: 60 * 10
              };
         },
 
-        _ses_callback = function(err, data) {
-            if (err) {
-                _log.error('_ses_callback ' + err.message);
-
-            } else {
-                _log.info('_ses_callback success: ');
-                _log.info(data);
-            }
-        },
-
-        _push_ses = function(msg) {
+        _push_ses = function(msg, ReceiptHandle) {
             // http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/SES.html#sendEmail-property
             try {
                 _log.info('push ses message with uuid %s', msg.uuid);
@@ -61,7 +52,28 @@ module.exports = function(config) {
                     'Source': msg.from,
                     'ReplyToAddresses': msg.reply_to
                 };
-                _ses.sendEmail(params, _ses_callback);
+
+                _ses.sendEmail(params, function(err, data) {
+
+                    if (err) {
+                        _log.error('_ses_callback ' + err.message);
+
+                    } else {
+                        _log.info('_ses_callback success: ');
+                        _log.info(data);
+                        _log.info('removing sqs message with ReceiptHandle %s', ReceiptHandle);
+                        _sqs.deleteMessage({QueueUrl: config.sqs.url, ReceiptHandle: ReceiptHandle},
+                            function(err, data) {
+                               if (err) {
+                                   _log.error('error deleting sqs messages with id %s', ReceiptHandle);
+                                   _log.error(err.message);
+                               } else {
+                                   _log.info('sqs message with id %s successfuly deleted', ReceiptHandle);
+
+                               }
+                        });
+                    }
+                });
 
             } catch(err) {
                 _log.error('_push_ses ' + err.name + ' ' + err.message);
@@ -80,7 +92,7 @@ module.exports = function(config) {
                 if (data.Messages !== undefined ) {
                     for (var i=0; i< data.Messages.length; i++) {
                         msg_body = JSON.parse(data.Messages[i]['Body']);
-                        _push_ses(msg_body);
+                        _push_ses(msg_body, data.Messages[i]['ReceiptHandle']);
                     }
 
                 } else {
