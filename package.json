@@ -12,7 +12,7 @@
       "email": "manuel@notempo1320.com",
       "url": "www.maigfrga.ntweb.co"
   },
-  "files": ["app/worker.js", "app/ntsqs.js", "app/ntses.js", "logger.js"],
+  "files": ["app/worker.js", "app/ntmsg.js", "logger.js"],
   "main": "worker.js",
   "repository": {
     "type": "git",

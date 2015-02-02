@@ -5,8 +5,8 @@ NTMSG is a very simple [iojs](https://iojs.org/)  application that reads email
 messages from Amazon SQS and send them through Amazon SES.
 Every message represents an email to be sent to one or more
 recipients, the main goal of this app is send emails keeping simplicity, for that
-reason this application does not make any message process,  that means that all the messages
-have to  be  formated before send them to the SQS Queue
+reason this application does not make any message process,  that means that all messages
+have to be formated before to be sent them to the SQS Queue
 
 
 
@@ -25,14 +25,13 @@ AWS Credentials
 ===================
 
 This application uses  [AWS SDK for JavaScript in Node.js] (https://aws.amazon.com/sdk-for-node-js/). The best way to configure
-your credentials is by creating ~/.aws/credentials file and adding the lines below:
+your credentials is by exporting enviroment variables:
+
 
 ```
-    [default]
-    aws_access_key_id = your_access_key
-    aws_secret_access_key = your_secret_key
-
-``
+export AWS_SECRET_ACCESS_KEY=asdjfl;34j;l34j
+export AWS_ACCESS_KEY_ID=34lsdfjafd
+```
 
 Configuration params
 =======================
@@ -48,6 +47,13 @@ the queue for you.
 * ["sqs"]["max-number-of-messages"] = max number of messages to retrieve from
 queue, at must 10 by request
 
+* ["logger"]["filename"] = Path to log file, directory has to exists and user
+must haved access to it.
+
+* ["logger"]["console"] = If is true, log info will be shown by screen.
+
+* ["aws"]["region"] = aws were queue is allocated.
+
 
 Configuration File Example
 ----------------------------
@@ -62,6 +68,9 @@ Configuration File Example
      "logger": {
          "filename": "/var/log/ntmsg.log",
          "console": true
+     },
+     "aws" {
+        "region": "us-west-2"
      }
 }
 ```
@@ -85,12 +94,13 @@ structure example:
 
 ```
     {
-        "uuid": "95d818b8-9bd0-11e4-a124-28d2447f45b8",
+        "uuid": "95d818b8-9bd0-11e4-a12 4-28d2447f45b8",
         "from": "remitent@email.com",
         "to": ["user1@email.com", "user2@another.com"],
         "subject": "test message",
         "text": "hello world",
-        "html": "<h1>Hello world</h1>"
+        "html": "<h1>Hello world</h1>",
+        "reply_to": ["email1@mydomain.com", "email2@mydomain.com"]
     }
 ```
 
@@ -102,3 +112,8 @@ Usage
 * nodejs app/worker.js --config /my/config/location/config.json
 
 
+
+Resources
+====================
+
+* [Amazon Documentation](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/SQS.html)

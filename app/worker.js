@@ -21,13 +21,11 @@ var  main = function() {
             },
 
             _start_loop = function(config) {
-                var _ntsqs = require('./ntsqs')(config),
-                    _ntses = require('./ntses')(config);
+                var _ntmsg = require('./ntmsg')(config);
 
                 setInterval(function() {
                     try {
-                        _ntsqs.pull();
-                        _ntses.push();
+                        _ntmsg.pull();
                     } catch(err) {
                         _log.error(err.name + ' ' + err.message);
                     }
