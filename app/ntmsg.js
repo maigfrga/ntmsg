@@ -11,7 +11,7 @@ module.exports = function(config) {
 
         _log = require('./logger').get_logger(config),
 
-        _queue_url = config.sqs['url'],
+        _queue_url = config.sqs.url,
 
         _init_aws = function() {
             AWS.config.region = config.aws.region;
@@ -91,12 +91,12 @@ module.exports = function(config) {
 
                 if (data.Messages !== undefined ) {
                     for (var i=0; i< data.Messages.length; i++) {
-                        msg_body = JSON.parse(data.Messages[i]['Body']);
-                        _push_ses(msg_body, data.Messages[i]['ReceiptHandle']);
+                        msg_body = JSON.parse(data.Messages[i].Body);
+                        _push_ses(msg_body, data.Messages[i].ReceiptHandle);
                     }
 
                 } else {
-                    _log.info('_process_sqs No messages available')
+                    _log.info('_process_sqs No messages available');
                 }
             }
 
@@ -110,8 +110,8 @@ module.exports = function(config) {
 
     return {
         pull: function() {
-            _init_aws(),
+            _init_aws();
             _pull_sqs();
         }
-    }
+    };
 };

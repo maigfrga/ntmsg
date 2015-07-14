@@ -32,6 +32,7 @@
     "aws-sdk": "",
     "lodash": "",
     "winston": "",
-    "commander": ""
+    "commander": "",
+    "jshint": ""
   }
 }

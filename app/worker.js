@@ -38,7 +38,7 @@ var  main = function() {
                 _log.info('starting ntmsg');
                 _start_loop(config);
             }
-        }
+        };
     })();
 
 main();

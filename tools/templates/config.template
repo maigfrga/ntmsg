@@ -1,0 +1,15 @@
+{
+    "aws": {
+        "region": "{{region}}"
+    },
+    "sqs": {
+        "url": "{{url}}",
+        "interval": {{interval}},
+        "max-number-of-messages": {{max_number_messages}}
+     },
+     "logger": {
+         "filename": "/opt/ntmsg.log",
+         "console": true,
+         "file": false
+     }
+}

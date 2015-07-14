@@ -5,9 +5,11 @@ module.exports = (function() {
         get_logger: function(config) {
             var logger = {},
                 transports = [
-                new (winston.transports.File)(
-                    { filename: config.logger.filename })
             ];
+
+            if (config.logger.file) {
+                transports.push(new (winston.transports.File)({ filename: config.logger.filename }));
+            }
 
             if(config.logger.console) {
                 transports.push(new (winston.transports.Console)());
@@ -19,5 +21,5 @@ module.exports = (function() {
 
             return logger;
         }
-    }
+    };
 })();
