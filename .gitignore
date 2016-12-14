@@ -6,3 +6,4 @@ deployments/
 *.pyc
 .DS_Store
 *.tar.gz
+.vagrant/

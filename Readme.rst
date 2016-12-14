@@ -1,12 +1,14 @@
 NTMSG
 =========================
 
-NTMSG is a very simple [iojs](https://iojs.org/)  application that reads email 
-messages from Amazon SQS and send them through Amazon SES.
+NTMSG is a python application that reads email
+messages from a Queue (Amazon SQS and Postgres backend supported)
+and send them through [mailgun](http://www.mailgun.com/) .
+
 Every message represents an email to be sent to one or more
 recipients, the main goal of this app is send emails keeping simplicity, for that
 reason this application does not make any message process,  that means that all messages
-have to be formated before to be sent them to the SQS Queue
+have to be formatted before to be sent them to the Queue
 
 
 
@@ -16,73 +18,86 @@ Requirements
 You need a queue and a valid AWS with credentials to access SES and SQS. If you
 don"t know to do it You can give a look to the links below:
 
-* [AWS SQS Introduction](http://www.maigfrga.ntweb.co/aws-sqs-introduction/)
+* [Flask utils](https://github.com/maigfrga/flaskutils)
 
-* [AWS SES Introduction](http://www.maigfrga.ntweb.co/introduccion-aws-ses/)
+* [Sqlalchemypostgresutils] (https://github.com/maigfrga/sqlalchemypostgresutils)
 
-
-AWS Credentials
-===================
-
-This application uses  [AWS SDK for JavaScript in Node.js] (https://aws.amazon.com/sdk-for-node-js/). The best way to configure
-your credentials is by exporting enviroment variables:
-
-
-```
-export AWS_SECRET_ACCESS_KEY=asdjfl;34j;l34j
-export AWS_ACCESS_KEY_ID=34lsdfjafd
-```
-
-Configuration params
-=======================
-
-You need to define a config.json wherever you want with values:
-
-
-* ["sqs"]["url"] = Queue url, it has to exists, this application doesn"t not create
-the queue for you.
-
-* ["sqs"]["interval"] = Interval in seconds to ask queue for more elements.
-
-* ["sqs"]["max-number-of-messages"] = max number of messages to retrieve from
-queue, at must 10 by request
-
-* ["logger"]["filename"] = Path to log file, directory has to exists and user
-must haved access to it.
-
-* ["logger"]["console"] = If is true, log info will be shown by screen.
-
-* ["aws"]["region"] = aws were queue is allocated.
-
-
-Configuration File Example
-----------------------------
-
-```
-{
-    "sqs": {
-        "url": "https://us-west-2.queue.amazonaws.com/63396744/myqueue",
-        "interval": 10,
-        "max-number-of-messages": 10
-     },
-     "logger": {
-         "filename": "/var/log/ntmsg.log",
-         "console": true
-     },
-     "aws" {
-        "region": "us-west-2"
-     }
-}
-```
-
+* [AWS SQS Introduction](http://www.maigfrga.ntweb.co/aws_sqs_introduction/)
 
 
 Instalation
 ==============
 
 ```
-npm install
+sudo pip3 install -r tools/requirements.txt
 ```
+
+
+Configuration params
+=======================
+
+INTERVAL
+-------------
+
+Interval in seconds to ask queue for more elements, default value is 1 second:
+
+```
+INTERVAL = 1
+```
+
+MAX_NUMBER_OF_MESSAGES
+---------------------------
+
+Max number of messages to retrieve from queue, at must 10 by request, by default
+1:
+
+```
+MAX_NUMBER_OF_MESSAGES = 1
+```
+
+QUEUE_BAKEND
+---------------------------
+
+POSTGRES AND AWS SQS backend are supported, 
+in order to use postgres, following configuration params
+should be added to the configuration file:
+
+```
+QUEUE_BAKEND = 'POSTGRES'
+
+POSTGRESQL_DATABASE_URI = 'postgresql://ds:dsps@localhost:5432/ds'
+```
+
+To use AWS SQS following configuration parameters should be added:
+
+```
+QUEUE_BAKEND = 'AWS_SQS'
+AWS_SECRET_ACCESS_KEY=asdjfl
+AWS_ACCESS_KEY_ID=34lsdfjafd
+SQS_URL = '' # Queue url, it has to exists, this application doesn"t not create the queue for you.
+AWS_REGION = 'us_west_2' # aws were queue is allocated.
+```
+
+if you don't want to expose your AWS credentials in the configuration file, you
+can export them as variables:
+
+```
+export AWS_SECRET_ACCESS_KEY=asdjfl
+export AWS_ACCESS_KEY_ID=34lsdfjafd
+```
+
+LOGGER
+--------------------------
+
+
+```
+LOGGER = {
+    'file': True,
+    'filename': '/var/log/ntmsg.log',
+    'console': True
+}
+```
+
 
 
 Message structure
@@ -94,8 +109,7 @@ structure example:
 
 ```
     {
-        "uuid": "95d818b8-9bd0-11e4-a12 4-28d2447f45b8",
-        "from": "remitent@email.com",
+        "from": "sender@email.com",
         "to": ["user1@email.com", "user2@another.com"],
         "subject": "test message",
         "text": "hello world",
@@ -104,16 +118,41 @@ structure example:
     }
 ```
 
+
+
+MAILGUN_API_KEY
+----------------------
+
+
+```
+MAILGUN_API_KEY = 'my_key'
+```
+
+
 Usage
 ================
 
-* iojs app/worker.js --config /my/config/location/config.json
 
-* nodejs app/worker.js --config /my/config/location/config.json
+Pushing a message to the queue:
+
+```
+python3 manage.py push --config config.production --msg '{ 
+        "from": "sender@email.com",                        
+        "to": ["user1@email.com", "user2@another.com"],    
+        "subject": "test message",                         
+        "text": "hello world",                             
+        "html": "<h1>Hello world</h1>",                    
+        "reply_to": ["email1@mydomain.com", "email2@mydomain.com"] 
+    }'
+```
+
+
 
 
 
 Resources
 ====================
 
-* [Amazon Documentation](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/SQS.html)
+* [Amazon SQS Documentation](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/SQS.html)
+
+* [Mailgun Documentation](https://documentation.mailgun.com/quickstart.html)
