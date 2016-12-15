@@ -3,6 +3,7 @@ from flaskutils.test import TransactionalTestCase
 from app.models import MessageQueue
 from app.service import QueueService, MailGunService
 
+import os
 import pytest
 
 
@@ -17,7 +18,6 @@ MSG = {
 }
 
 
-
 class TestDBBackend(TransactionalTestCase):
     def setup(self):
         super(TestDBBackend, self).setup()
@@ -29,7 +29,7 @@ class TestDBBackend(TransactionalTestCase):
         uuid = service.push(**MSG)
         assert 1 == MessageQueue.objects.count()
         msg_list = service.pull()
-
+        assert 0 == MessageQueue.objects.count()
         assert msg_list[0]['uuid'] == str(uuid)
 
 
@@ -51,7 +51,6 @@ class TestSQSBackend(object):
             QueueService()
             assert 'invalid aws region' in str(excinfo)
 
-
         app.config['AWS_REGION'] = 'us-west-2'
 
         if 'SQS_URL' in app.config:
@@ -69,6 +68,9 @@ class TestMailGunBackend(object):
     def test_error_config(self):
         if 'MAILGUN_API_KEY' in app.config:
             del app.config['MAILGUN_API_KEY']
+
+        if 'MAILGUN_API_KEY' in os.environ:
+            del os.environ['MAILGUN_API_KEY']
 
         with pytest.raises(ValueError) as excinfo:
             MailGunService()

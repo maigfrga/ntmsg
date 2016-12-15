@@ -7,7 +7,6 @@ import uuid
 import os
 
 
-
 class BaseService(object):
     def push(self, **msg):
         raise NotImplementedError('Invalid backend')
@@ -27,10 +26,12 @@ class DBService(BaseService):
         return obj.key
 
     def pull(self, n_messages=1):
-        return [
-            obj.msg for obj in
-            MessageQueue.objects.filter_by(limit=n_messages)
-        ]
+        msg_list = []
+        for obj in MessageQueue.objects.filter_by(limit=n_messages):
+            msg_list.append(obj.msg)
+            obj.delete()
+        Session.commit()
+        return msg_list
 
 
 class SQSService(BaseService):

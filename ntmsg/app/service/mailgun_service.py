@@ -1,6 +1,9 @@
 from flaskutils import app
+from requests.auth import HTTPBasicAuth
 
+import requests
 import os
+
 
 class MailGunService(object):
     def __init__(self):
@@ -11,19 +14,20 @@ class MailGunService(object):
         else:
             raise ValueError('invalid mailgun credentials')
 
+        if 'MAILGUN_DOMAIN_NAME' in app.config:
+            self.domain = app.config['MAILGUN_DOMAIN_NAME']
+        else:
+            raise ValueError('invalid mailgun domain name')
+
+        self.url = 'https://api.mailgun.net/v3/{}/messages'.format(
+            self.domain
+        )
         self.headers = {
         }
 
-
     def send(self, msg):
-        payload = {
-            'from': msg['from'],
-            'subject': msg['subject'],
-            'text': msg['text']
-        }
 
-        for recipient in msg['to']:
-            m = payload.copy()
-            m['to'] = recipient
-            print(m)
+        auth = HTTPBasicAuth('api', self.api_key)
+        requests.post(
+            self.url, params=msg, auth=auth)
         return msg['uuid']

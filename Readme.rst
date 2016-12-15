@@ -119,6 +119,9 @@ structure example:
 ```
 
 
+Any field specified in [mailgun's documentation](https://documentation.mailgun.com/api-sending.html#sending) 
+is valid
+
 
 MAILGUN_API_KEY
 ----------------------
@@ -129,6 +132,17 @@ MAILGUN_API_KEY = 'my_key'
 ```
 
 
+MAILGUN_DOMAIN_NAME
+-------------------------
+
+```
+
+MAILGUN_DOMAIN_NAME = 'mydomain.com'
+
+
+```
+
+
 Usage
 ================
 
@@ -136,7 +150,8 @@ Usage
 Pushing a message to the queue:
 
 ```
-python3 manage.py push --config config.production --msg '{ 
+
+python3 manage.py push --settings config.production --msg '{ 
         "from": "sender@email.com",                        
         "to": ["user1@email.com", "user2@another.com"],    
         "subject": "test message",                         
@@ -144,9 +159,12 @@ python3 manage.py push --config config.production --msg '{
         "html": "<h1>Hello world</h1>",                    
         "reply_to": ["email1@mydomain.com", "email2@mydomain.com"] 
     }'
+
 ```
 
 
+
+Sendind 
 
 
 

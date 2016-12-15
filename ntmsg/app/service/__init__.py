@@ -17,7 +17,6 @@ class QueueService():
             raise NotImplementedError('Invalid backend')
         self.mailgun = MailGunService()
 
-
     def push(self, **msg):
         return self.backend.push(**msg)
 
